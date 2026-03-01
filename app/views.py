@@ -1,11 +1,47 @@
 from app import app
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash
+from flask_mail import Message
+from app import app, mail
+from app.forms import ContactForm
 
 
 ###
 # Routing for your application.
 ###
 
+from flask import render_template, request, redirect, url_for, flash
+from flask_mail import Message
+from app import app, mail
+from .forms import ContactForm
+
+
+from flask import render_template, redirect, url_for, flash
+from flask_mail import Message
+from app import app, mail
+from .forms import ContactForm
+
+
+@app.route("/contact", methods=["GET", "POST"])
+def contact():
+    form = ContactForm()
+
+    if form.validate_on_submit():
+        msg = Message(
+            subject="New Contact Form Submission",
+            recipients=["inbox@mailtrap.test"],  # any email works in sandbox
+        )
+
+        msg.body = f"""Name: {form.name.data}
+Email: {form.email.data}
+Subject: {form.subject.data}
+Message: {form.message.data}
+"""
+        mail.send(msg)
+
+        flash("Message sent successfully!", "success")
+        return redirect(url_for("contact"))
+
+    return render_template("contact.html", form=form)
 @app.route('/')
 def home():
     """Render website's home page."""
